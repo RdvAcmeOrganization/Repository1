@@ -36,7 +36,7 @@ jobs:
             echo "LOKALISE_API_TOKEN is not set. For more details read https://google.com" && exit 1
           fi
           if [ -z "$LOKALISE_PROJECT_ID" ]; then
-            echo "LOKALISE_PROJECT_ID is not set. For more details read https://google.com" && exit 1
+            echo "LOKALISE_PROJECT_ID is not set in the repository. For more details read https://google.com" && exit 1
           fi
 
     # - name: Make request to external URI
