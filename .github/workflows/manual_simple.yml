@@ -1,5 +1,5 @@
 # This workflow automates the download of translated files from Lokalise  
-# on a scheduled basis (every Friday at 09:00 UTC) or via manual trigger.  
+# on a scheduled basis (every 5 minutes) or via manual trigger.  
 #  
 # Key actions:  
 # 1. Fetches filtered translations (French, German, Spanish) with statuses:  
@@ -19,11 +19,11 @@ on:
   workflow_dispatch:
     inputs:
       languages:
-        description: 'Lokalise API token'
+        description: 'Languages to download'
         required: true
-        default: "['fr', 'de', 'es']"
-  # schedule:
-  #   - cron: '0 9 * * fri'
+        default: "['fr', 'de', 'es', 'fr-CA']"
+  schedule:
+    - cron: '*/5 * * * *'
 
 jobs:
   makeRequest:
