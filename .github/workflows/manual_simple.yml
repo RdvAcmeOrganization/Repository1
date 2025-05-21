@@ -22,8 +22,8 @@ on:
         description: 'Languages to download'
         required: true
         default: "['fr', 'de', 'es', 'fr-CA']"
-  schedule:
-    - cron: '*/5 * * * *'
+  # schedule:
+  #   - cron: '*/5 * * * *'
 
 jobs:
   makeRequest:
