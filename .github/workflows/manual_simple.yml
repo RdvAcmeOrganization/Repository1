@@ -68,8 +68,7 @@ jobs:
           https://api.lokalise.com/api2/projects/${{ env.LOKALISE_PROJECT_ID }}/files/download)
 
           if [ "$RESPONSE" -ne 200 ]; then
-            SLACK_WEBHOOK_URL: ${{ 'https://smee.io/HMel3UU8fCNtlx7'}}
             curl -X POST -H 'Content-type: application/json' \
-            --data '{"text":"Lokalise request failed with status code '"$RESPONSE"'"}' \
-            ${{ env.SLACK_WEBHOOK_URL }}
+              --data "{\"text\":\"Lokalise request failed with status code $RESPONSE\"}" \
+              'https://smee.io/HMel3UU8fCNtlx7'
           fi
