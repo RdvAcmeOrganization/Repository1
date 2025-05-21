@@ -46,9 +46,11 @@ jobs:
 
       - name: Make request to external URI
         run: |
-          LANGS=$(echo "${{ github.event.inputs.languages }}" | sed "s/\[//;s/\]//;s/'//g")
-          myrepo=${{ github.repository }}
-          echo "myrepo value: $myrepo"
+          myLangs=$(echo "${{ github.event.inputs.languages }}" | sed "s/\[//;s/\]//;s/'//g")
+          myRepo=${{ github.repository }}
+          myBranch=$(echo "${{ github.ref }}" | sed 's|refs/heads/||')
+          echo "myRepo value: $myRepo"
+          echo "myBranch value: $myBranch"
           RESPONSE=$(curl -s -o response.json -w "%{http_code}" -X POST \
           -H "X-Api-Token: ${{ env.LOKALISE_API_TOKEN }}" \
           -H "accept: application/json" \
@@ -56,8 +58,8 @@ jobs:
           -d '{
             "format": "json",
             "filter_data": ["translated","reviewed","verified"],
-            "filter_langs": ['"${LANGS//,/","}"'],
-            "filter_repositories":["NintexGlobal/pi-processmodeler/tree/lokalise/test1/packages/pi-administration:lokalise/test1"],
+            "filter_langs": ['"${myLangs//,/","}"'],
+            "filter_repositories":["'"$myRepo"/tree/"$myBranch"/packages/pi-administration:"$myBranch""],
             "directory_prefix": "",
             "original_filenames": true,
             "triggers": [
