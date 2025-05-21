@@ -41,7 +41,7 @@ jobs:
             echo "LOKALISE_API_TOKEN is not set. For more details read https://google.com" && exit 1
           fi
           if [ -z "$LOKALISE_PROJECT_ID" ]; then
-            echo "LOKALISE_PROJECT_ID is not set in the repository. For more details read https://google.com" && exit 1
+            echo "LOKALISE_PROJECT_ID is not set in the repository variables. For more details read https://google.com" && exit 1
           fi
 
       - name: Make request to external URI
@@ -67,9 +67,9 @@ jobs:
           ]}' \
           https://api.lokalise.com/api2/projects/${{ env.LOKALISE_PROJECT_ID }}/files/download)
 
-    #   if [ "$RESPONSE" -ne 200 ]; then
-    #     SLACK_WEBHOOK_URL: ${{ 'https://smee.io/HMel3UU8fCNtlx7'}}
-    #     curl -X POST -H 'Content-type: application/json' \
-    #     --data '{"text":"Lokalise request failed with status code '"$RESPONSE"'"}' \
-    #     ${{ env.SLACK_WEBHOOK_URL }}
-    #   fi
+          if [ "$RESPONSE" -ne 200 ]; then
+            SLACK_WEBHOOK_URL: ${{ 'https://smee.io/HMel3UU8fCNtlx7'}}
+            curl -X POST -H 'Content-type: application/json' \
+            --data '{"text":"Lokalise request failed with status code '"$RESPONSE"'"}' \
+            ${{ env.SLACK_WEBHOOK_URL }}
+          fi
