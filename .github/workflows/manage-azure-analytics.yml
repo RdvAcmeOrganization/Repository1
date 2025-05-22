@@ -37,7 +37,7 @@ jobs:
           # tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           # subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         # Start or stop the Azure Stream Analytics job based on the input parameter or schedule
-      - name: Manage Azure Stream Analytics Job
+      - name: ${{github.event_name}} - Manage Azure Stream Analytics Job ${{github.event.inputs.action}}
         run: |
           JOB_NAME="delStreamAnaliticsJob"
           RESOURCE_GROUP="rsg-wus-chatterbox"
