@@ -1,0 +1,78 @@
+name: Manage Azure Stream Analytics Job
+
+on:
+  # Manual trigger with input parameter
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to perform (start/stop)'
+        required: true
+        default: 'stop'
+        type: choice
+        options:
+          - start
+          - stop
+  # You could also add a schedule if needed
+  # schedule:
+  #   - cron: '0 19 * * *'  # Example: run at 7 PM UTC daily
+
+jobs:
+  manage-analytics-job:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      # Log in to Azure using service principal
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          # If you set up individual secrets instead of the JSON, use:
+          # client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          # client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+          # tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          # subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      
+      # Start or stop the Azure Stream Analytics job based on the input parameter
+      - name: Manage Azure Stream Analytics Job
+        run: |
+          ACTION="${{ github.event.inputs.action }}"
+          JOB_NAME="delStreamAnaliticsJob"
+          RESOURCE_GROUP="rsg-wus-chatterbox"
+          
+          if [ "$ACTION" == "stop" ]; then
+            echo "Stopping Azure Stream Analytics Job: $JOB_NAME"
+            az stream-analytics job stop --name "$JOB_NAME" --resource-group "$RESOURCE_GROUP"
+            echo "Stream Analytics job stop command issued successfully"
+            EXPECTED_STATE="Stopped"
+          elif [ "$ACTION" == "start" ]; then
+            echo "Starting Azure Stream Analytics Job: $JOB_NAME"
+            az stream-analytics job start --name "$JOB_NAME" --resource-group "$RESOURCE_GROUP"
+            echo "Stream Analytics job start command issued successfully"
+            EXPECTED_STATE="Running"
+          else
+            echo "Invalid action specified: $ACTION. Must be 'start' or 'stop'."
+            exit 1
+          fi
+          
+          # Wait a moment for the operation to begin processing
+          echo "Waiting for job state change to process..."
+          sleep 10
+
+      # Check job status after operation
+      - name: Job Status
+        run: |
+          JOB_NAME="delStreamAnaliticsJob"
+          RESOURCE_GROUP="rsg-wus-chatterbox"
+          ACTION="${{ github.event.inputs.action }}"
+          
+          JOB_STATUS=$(az stream-analytics job show --name "$JOB_NAME" --resource-group "$RESOURCE_GROUP" --query "jobState" -o tsv)
+          echo "Current job status: $JOB_STATUS"
+          
+          if [ "$ACTION" == "stop" ] && [ "$JOB_STATUS" != "Stopped" ]; then
+            echo "Warning: Job may still be in the process of stopping. Final state should be 'Stopped'."
+          elif [ "$ACTION" == "start" ] && [ "$JOB_STATUS" != "Running" ]; then
+            echo "Warning: Job may still be in the process of starting. Final state should be 'Running'."
+          fi
