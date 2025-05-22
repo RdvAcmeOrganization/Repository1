@@ -1,7 +1,6 @@
 name: Manage Azure Stream Analytics Job
 
-on:
-  # Manual trigger with input parameter
+on:  # Manual trigger with input parameter
   workflow_dispatch:
     inputs:
       action:
@@ -12,9 +11,12 @@ on:
         options:
           - start
           - stop
-  # You could also add a schedule if needed
-  # schedule:
-  #   - cron: '0 19 * * *'  # Example: run at 7 PM UTC daily
+  # Scheduled triggers
+  schedule:
+    # Every Monday at 5:00 PM UTC - Start job
+    - cron: '0 17 * * 1'
+    # Every Monday at 6:00 PM UTC - Stop job
+    - cron: '0 18 * * 1'
 
 jobs:
   manage-analytics-job:
@@ -34,13 +36,31 @@ jobs:
           # client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
           # tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           # subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      
-      # Start or stop the Azure Stream Analytics job based on the input parameter
+        # Start or stop the Azure Stream Analytics job based on the input parameter or schedule
       - name: Manage Azure Stream Analytics Job
         run: |
-          ACTION="${{ github.event.inputs.action }}"
           JOB_NAME="delStreamAnaliticsJob"
           RESOURCE_GROUP="rsg-wus-chatterbox"
+          
+          # Determine if this is a scheduled run or manual trigger
+          if [[ "${{ github.event_name }}" == "schedule" ]]; then
+            # Get current hour in UTC to determine if we should start or stop
+            CURRENT_HOUR=$(date -u +%H)
+            if [[ $CURRENT_HOUR == "17" ]]; then
+              ACTION="start"
+              echo "Scheduled start job triggered at 5 PM UTC"
+            elif [[ $CURRENT_HOUR == "18" ]]; then
+              ACTION="stop"
+              echo "Scheduled stop job triggered at 6 PM UTC"
+            else
+              echo "Scheduled run at unexpected hour: $CURRENT_HOUR UTC"
+              exit 1
+            fi
+          else
+            # For manual workflow_dispatch, use the input parameter
+            ACTION="${{ github.event.inputs.action }}"
+            echo "Manual trigger with action: $ACTION"
+          fi
           
           if [ "$ACTION" == "stop" ]; then
             echo "Stopping Azure Stream Analytics Job: $JOB_NAME"
@@ -59,14 +79,23 @@ jobs:
           
           # Wait a moment for the operation to begin processing
           echo "Waiting for job state change to process..."
-          sleep 10
-
-      # Check job status after operation
+          sleep 10      # Check job status after operation
       - name: Job Status
         run: |
           JOB_NAME="delStreamAnaliticsJob"
           RESOURCE_GROUP="rsg-wus-chatterbox"
-          ACTION="${{ github.event.inputs.action }}"
+          
+          # Determine action for status checking
+          if [[ "${{ github.event_name }}" == "schedule" ]]; then
+            CURRENT_HOUR=$(date -u +%H)
+            if [[ $CURRENT_HOUR == "17" ]]; then
+              ACTION="start"
+            elif [[ $CURRENT_HOUR == "18" ]]; then
+              ACTION="stop"
+            fi
+          else
+            ACTION="${{ github.event.inputs.action }}"
+          fi
           
           JOB_STATUS=$(az stream-analytics job show --name "$JOB_NAME" --resource-group "$RESOURCE_GROUP" --query "jobState" -o tsv)
           echo "Current job status: $JOB_STATUS"
