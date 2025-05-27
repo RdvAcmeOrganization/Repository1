@@ -26,12 +26,10 @@ on:
   #   - cron: '*/5 * * * *'
 
 jobs:
-  makeRequest:
+  validateVariables:
     runs-on: ubuntu-latest
 
     steps:
-      - run: echo "Getting latest translation files from Lokalise"
-
       - name: Validate required secrets and environment variables
         env:
           LOKALISE_API_TOKEN: ${{ secrets.LOKALISE_API_TOKEN }}
@@ -48,6 +46,13 @@ jobs:
           if [ -z "$LOKALISE_LANGUAGES" ]; then
             echo "LOKALISE_LANGUAGES is not set in the repository variables. For more details read https://google.com" && exit 1
           fi
+
+
+  makeRequest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - run: echo "Getting latest translation files from Lokalise"
 
       - name: Make request to external URI
         run: |
