@@ -36,15 +36,26 @@ jobs:
           LOKALISE_PROJECT_ID: ${{ vars.LOKALISE_PROJECT_ID }}
           LOKALISE_LANGUAGES: ${{ vars.LOKALISE_LANGUAGES }}
 
-        run: | # Validate that variables are set and not empty
-          if [ -z "$LOKALISE_API_TOKEN" ] || [ ${#LOKALISE_API_TOKEN} -lt 1 ]; then
-            echo "LOKALISE_API_TOKEN is not set or empty in organization secrets. For more details read https://google.com" && exit 1
+        run: |
+          if [ -z "$LOKALISE_API_TOKEN" ]; then
+            echo "LOKALISE_API_TOKEN is not set in organization secrets. For more details read https://google.com" && exit 1
           fi
-          if [ -z "$LOKALISE_PROJECT_ID" ] || [ ${#LOKALISE_PROJECT_ID} -lt 1 ]; then
-            echo "LOKALISE_PROJECT_ID is not set or empty in the repository variables. For more details read https://google.com" && exit 1
+          if [ -z "$LOKALISE_PROJECT_ID" ]; then
+            echo "LOKALISE_PROJECT_ID is not set in the repository variables. For more details read https://google.com" && exit 1
           fi
-          if [ -z "$LOKALISE_LANGUAGES" ] || [ ${#LOKALISE_LANGUAGES} -lt 1 ]; then
-            echo "LOKALISE_LANGUAGES is not set or empty in the repository variables. For more details read https://google.com" && exit 1
+          if [ -z "$LOKALISE_LANGUAGES" ]; then
+            echo "LOKALISE_LANGUAGES is not set in the repository variables. For more details read https://google.com" && exit 1
+          fi
+          
+          # Validate key lengths (ensure they have at least one character)
+          if [ ${#LOKALISE_API_TOKEN} -lt 1 ]; then
+            echo "LOKALISE_API_TOKEN must have at least one character" && exit 1
+          fi
+          if [ ${#LOKALISE_PROJECT_ID} -lt 1 ]; then
+            echo "LOKALISE_PROJECT_ID must have at least one character" && exit 1
+          fi
+          if [ ${#LOKALISE_LANGUAGES} -lt 1 ]; then
+            echo "LOKALISE_LANGUAGES must have at least one character" && exit 1
           fi
 
   makeRequest:
