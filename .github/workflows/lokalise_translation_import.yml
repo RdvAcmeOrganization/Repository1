@@ -12,16 +12,16 @@
 # - LOKALISE_PROJECT_ID: Lokalise project identifier  
 # - LOKALISE_API_TOKEN: Authentication token for API access 
 
-name: Get latest translation files manually
+name: Get latest lokalise translation files
 
 on:
   # allows to manually run the job at any time
   workflow_dispatch:
-    inputs:
-      languages:
-        description: 'Languages to download'
-        required: true
-        default: "['fr', 'de', 'es', 'fr-CA']"
+    # inputs:
+    #   languages:
+    #     description: 'Languages to download'
+    #     required: true
+    #     default: "['en','fr', 'de', 'es', 'fr-CA']"
   # schedule:
   #   - cron: '*/5 * * * *'
 
@@ -36,21 +36,28 @@ jobs:
         env:
           LOKALISE_API_TOKEN: ${{ secrets.LOKALISE_API_TOKEN }}
           LOKALISE_PROJECT_ID: ${{ vars.LOKALISE_PROJECT_ID }}
+          LOKALISE_LANGUAGES: ${{ vars.LOKALISE_LANGUAGES }}
+
         run: |
           if [ -z "$LOKALISE_API_TOKEN" ]; then
-            echo "LOKALISE_API_TOKEN is not set. For more details read https://google.com" && exit 1
+            echo "LOKALISE_API_TOKEN is not set in organization secrets For more details read https://google.com" && exit 1
           fi
           if [ -z "$LOKALISE_PROJECT_ID" ]; then
             echo "LOKALISE_PROJECT_ID is not set in the repository variables. For more details read https://google.com" && exit 1
           fi
+          if [ -z "$LOKALISE_LANGUAGES" ]; then
+            echo "LOKALISE_LANGUAGES is not set in the repository variables. For more details read https://google.com" && exit 1
+          fi
 
       - name: Make request to external URI
         run: |
-          myLangs=$(echo "${{ github.event.inputs.languages }}" | sed "s/\[//;s/\]//;s/'//g")
+          myLangs=$(echo "${{ env.LANGUAGES }}" | sed "s/\[//;s/\]//;s/'//g")
           myRepo=${{ github.repository }}
           myBranch=$(echo "${{ github.ref }}" | sed 's|refs/heads/||')
           echo "myRepo value: $myRepo"
           echo "myBranch value: $myBranch"
+          echo "myLangs value: $myLangs"
+
           RESPONSE=$(curl -s -o response.json -w "%{http_code}" -X POST \
             -H "X-Api-Token: ${{ env.LOKALISE_API_TOKEN }}" \
             -H "accept: application/json" \

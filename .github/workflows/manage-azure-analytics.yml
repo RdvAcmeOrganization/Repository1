@@ -1,6 +1,6 @@
-name: Manage Azure Stream Analytics Job
+# Manage Azure Stream Analytics Job
 
-on:  # Manual trigger with input parameter
+on:  # Manual trigger with input parameters
   workflow_dispatch:
     inputs:
       action:
@@ -11,6 +11,16 @@ on:  # Manual trigger with input parameter
         options:
           - start
           - stop
+      job_name:
+        description: 'Azure Stream Analytics Job Name'
+        required: false
+        default: 'delStreamAnaliticsJob'
+        type: string
+      resource_group:
+        description: 'Azure Resource Group Name'
+        required: false
+        default: 'rsg-wus-chatterbox'
+        type: string
   # Scheduled triggers
   schedule:
     # Every Monday at 5:00 PM UTC - Start job
@@ -43,11 +53,16 @@ jobs:
           # client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
           # tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           # subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-        # Start or stop the Azure Stream Analytics job based on the input parameter or schedule
-      - name: ${{github.event_name}} - Manage Azure Stream Analytics Job ${{github.event.inputs.action}}
+      
+      # Start or stop the Azure Stream Analytics job based on the input parameter or schedule
+      - name: Manage Azure Stream Analytics Job
         run: |
-          JOB_NAME="delStreamAnaliticsJob"
-          RESOURCE_GROUP="rsg-wus-chatterbox"
+          # Use input parameters if provided, otherwise use defaults
+          JOB_NAME="${{ github.event.inputs.job_name || 'delStreamAnaliticsJob' }}"
+          RESOURCE_GROUP="${{ github.event.inputs.resource_group || 'rsg-wus-chatterbox' }}"
+          
+          echo "Using job name: $JOB_NAME"
+          echo "Using resource group: $RESOURCE_GROUP"
           
           # Determine if this is a scheduled run or manual trigger
           if [[ "${{ github.event_name }}" == "schedule" ]]; then
@@ -86,11 +101,11 @@ jobs:
           
           # Wait a moment for the operation to begin processing
           echo "Waiting for job state change to process..."
-          sleep 10      # Check job status after operation
-      - name: Job Status
+          sleep 10      # Check job status after operation      - name: Job Status
         run: |
-          JOB_NAME="delStreamAnaliticsJob"
-          RESOURCE_GROUP="rsg-wus-chatterbox"
+          # Use input parameters if provided, otherwise use defaults
+          JOB_NAME="${{ github.event.inputs.job_name || 'delStreamAnaliticsJob' }}"
+          RESOURCE_GROUP="${{ github.event.inputs.resource_group || 'rsg-wus-chatterbox' }}"
           
           # Determine action for status checking
           if [[ "${{ github.event_name }}" == "schedule" ]]; then
