@@ -96,6 +96,7 @@ jobs:
               \"directory_prefix\": \"\",\
               \"export_empty_as\": \"empty\",\
               \"indentation\": \"2sp\",\
+              \"json_unescaped_slashes\": true,\
               \"original_filenames\": true,\
               \"triggers\": [\
                 \"github\"\
