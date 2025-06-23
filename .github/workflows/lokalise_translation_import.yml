@@ -76,9 +76,11 @@ jobs:
           myLangs=$(echo "${{ env.LANGUAGES }}" | sed "s/\[//;s/\]//;s/'//g")
           myRepo=${{ github.repository }}
           myBranch=$(echo "${{ github.ref }}" | sed 's|refs/heads/||')
+          myProjectId=${{ env.LOKALISE_PROJECT_ID }}
           echo "myRepo value: $myRepo"
           echo "myBranch value: $myBranch"
           echo "myLangs value: $myLangs"
+          echo "myProjectId value: $myProjectId"
 
           RESPONSE=$(curl -s -o response.json -w "%{http_code}" -X POST \
             -H "X-Api-Token: ${{ env.LOKALISE_API_TOKEN }}" \
@@ -95,7 +97,7 @@ jobs:
                 \"github\"\
               ]\
             }" \
-            https://api.lokalise.com/api2/projects/${{ env.LOKALISE_PROJECT_ID }}/files/download)
+            https://api.lokalise.com/api2/projects/${myRepo}/files/download)
 
           if [ "$RESPONSE" -ne 200 ]; then
             curl -X POST -H 'Content-type: application/json' \
