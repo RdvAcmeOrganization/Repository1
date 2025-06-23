@@ -81,13 +81,13 @@ jobs:
       - name: Make request to external URI
         env:
           LOKALISE_API_TOKEN: ${{ secrets.LOKALISE_API_TOKEN }}
-          LOKALISE_PROJECT_ID: ${{ env.LOKALISE_PROJECT_ID }}
-          LOKALISE_LANGUAGES: ${{ env.LOKALISE_LANGUAGES }}
+          LOKALISE_PROJECT_ID: ${{ vars.LOKALISE_PROJECT_ID }}
+          LOKALISE_LANGUAGES: ${{ vars.LOKALISE_LANGUAGES }}
         run: |
           myLangs=$(echo "$LOKALISE_LANGUAGES" | sed "s/\[//;s/\]//;s/'//g")
           myRepo=${{ github.repository }}
           myBranch=$(echo "${{ github.ref }}" | sed 's|refs/heads/||')
-          myProjectId=${{env.LOKALISE_PROJECT_ID}}
+          myProjectId=${{vars.LOKALISE_PROJECT_ID}}
           echo "myRepo value: $myRepo"
           echo "myBranch value: $myBranch"
           echo "myLangs value: $myLangs"
