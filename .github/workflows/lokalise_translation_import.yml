@@ -91,7 +91,6 @@ jobs:
             -H "content-type: application/json" \
             -d "{\
               \"format\": \"json\",\
-              \"filter_data\": [\"translated\",\"reviewed\",\"verified\"],\
               \"filter_langs\": [$(echo $myLangs | sed 's/,/\",\"/g; s/^/\"/; s/$/\"/')],\
               \"directory_prefix\": \"\",\
               \"export_empty_as\": \"empty\",\
