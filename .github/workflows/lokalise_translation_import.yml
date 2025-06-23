@@ -72,10 +72,6 @@ jobs:
           fi
 
       - name: Make request to external URI
-        # env:
-        #   LOKALISE_API_TOKEN: ${{ secrets.LOKALISE_API_TOKEN }}
-        #   LOKALISE_PROJECT_ID: ${{ vars.LOKALISE_PROJECT_ID }}
-        #   LOKALISE_LANGUAGES: ${{ vars.LOKALISE_LANGUAGES }}
         run: |
           myLangs=$(echo "$LOKALISE_LANGUAGES" | sed "s/\[//;s/\]//;s/'//g")
           myRepo=${{ github.repository }}
@@ -85,7 +81,9 @@ jobs:
           echo "myBranch value: $myBranch"
           echo "myLangs value: $myLangs"
           echo "myProjectId value: $myProjectId"
-
+          echo "https://api.lokalise.com/api2/projects/$myProjectId/files/download)"
+          echo "headers: $LOKALISE_API_TOKEN"
+          
           # RESPONSE=$(curl -s -o response.json -w "%{http_code}" -X POST \
           #   -H "X-Api-Token: $LOKALISE_API_TOKEN" \
           #   -H "accept: application/json" \
