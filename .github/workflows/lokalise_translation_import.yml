@@ -66,6 +66,7 @@ jobs:
 
   makeRequest:
     runs-on: ubuntu-latest
+    needs: validateVariables
 
     steps:
       - run: echo "Getting latest translation files from Lokalise"
