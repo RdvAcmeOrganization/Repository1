@@ -92,7 +92,7 @@ jobs:
             -d "{\
               \"format\": \"json\",\
               \"filter_data\": [\"translated\",\"reviewed\",\"verified\"],\
-              \"filter_langs\": ${myLangs//,\"/\"},\
+              \"filter_langs\": [$(echo $myLangs | sed 's/,/\",\"/g; s/^/\"/; s/$/\"/')],\
               \"filter_repositories\": [\"$myRepo/tree/$myBranch/packages/pi-administration:$myBranch\"],\
               \"directory_prefix\": \"\",\
               \"export_empty_as\": \"empty\",\
