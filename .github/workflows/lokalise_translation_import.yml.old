@@ -62,7 +62,6 @@ jobs:
           echo "myBranch value: $myBranch"
           echo "myLangs value: $myLangs"
           echo "GITHUB_REPOSITORY: ${{ github.repository }}"
-          echo "GITHUB_REF: ${{ github.ref }}"
           echo "GITHUB_SHA: ${{ github.sha }}"
           echo "GITHUB_EVENT_NAME: ${{ github.event_name }}"
           echo "GITHUB_EVENT_PATH: ${{ github.event_path }}"
@@ -77,7 +76,7 @@ jobs:
           #   "format": "json",
           #   "filter_data": ["translated","reviewed","verified"],
           #   "filter_langs": ["fr","de","es","fr-CA"],
-          #   "filter_repositories":["NintexGlobal/pi-processmodeler/tree/lokalise/test1/packages/pi-administration:lokalise/test1"],
+          #   "filter_repositories":[`${{ github.repository }}`],
           #   "directory_prefix": "",
           #   "export_empty_as": "empty",
           #   "webhook_url": "",
