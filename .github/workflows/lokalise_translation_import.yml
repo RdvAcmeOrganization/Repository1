@@ -91,6 +91,7 @@ jobs:
             -H "content-type: application/json" \
             -d "{\
               \"format\": \"json\",\
+              \"filter_langs\": [\"en\",\"es\",\"fr\",\"de\",\"fr-CA\"],\
               \"directory_prefix\": \"\",\
               \"export_empty_as\": \"empty\",\
               \"export_sort\": \"a_z\",\
