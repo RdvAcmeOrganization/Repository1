@@ -1,0 +1,96 @@
+# This workflow automates the download of translated files from Lokalise  
+# on a scheduled basis (every 5 minutes) or via manual trigger.  
+#  
+# Key actions:  
+# 1. Fetches filtered translations (French, German, Spanish) with statuses:  
+#    - Translated  
+#    - Reviewed  
+#    - Verified  
+# 2. Uses the Lokalise API to export JSON files for the specified repository path.  
+#  
+# Secrets required:  
+# - LOKALISE_PROJECT_ID: Lokalise project identifier  
+# - LOKALISE_API_TOKEN: Authentication token for API access 
+
+name: Get latest lokalise translation files
+
+on:
+  # allows to manually run the job at any time
+  workflow_dispatch:
+    # inputs:
+    #   languages:
+    #     description: 'Languages to download'
+    #     required: true
+    #     default: "['en','fr', 'de', 'es', 'fr-CA']"
+  # schedule:
+  #   - cron: '*/5 * * * *'
+
+jobs:
+  validateVariables:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Validate required secrets and environment variables
+        env:
+          LOKALISE_API_TOKEN: ${{ secrets.LOKALISE_API_TOKEN }}
+          LOKALISE_PROJECT_ID: ${{ vars.LOKALISE_PROJECT_ID }}
+          LOKALISE_LANGUAGES: ${{ vars.LOKALISE_LANGUAGES }}
+
+        run: | # Validate that variables are set and not empty
+          if [ -z "$LOKALISE_API_TOKEN" ] || [ ${#LOKALISE_API_TOKEN} -lt 1 ]; then
+            echo "LOKALISE_API_TOKEN is not set or empty in organization secrets. For more details read https://google.com" && exit 1
+          fi
+          if [ -z "$LOKALISE_PROJECT_ID" ] || [ ${#LOKALISE_PROJECT_ID} -lt 1 ]; then
+            echo "LOKALISE_PROJECT_ID is not set or empty in the repository variables. For more details read https://google.com" && exit 1
+          fi
+          if [ -z "$LOKALISE_LANGUAGES" ] || [ ${#LOKALISE_LANGUAGES} -lt 1 ]; then
+            echo "LOKALISE_LANGUAGES is not set or empty in the repository variables. For more details read https://google.com" && exit 1
+          fi
+
+  makeRequest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - run: echo "Getting latest translation files from Lokalise"
+
+      - name: Make request to external URI
+        run: |
+          myLangs=$(echo "${{ env.LANGUAGES }}" | sed "s/\[//;s/\]//;s/'//g")
+          myRepo=${{ github.repository }}
+          myBranch=$(echo "${{ github.ref }}" | sed 's|refs/heads/||')
+          echo "myRepo value: $myRepo"
+          echo "myBranch value: $myBranch"
+          echo "myLangs value: $myLangs"
+          echo "GITHUB_REPOSITORY: ${{ github.repository }}"
+          echo "GITHUB_REF: ${{ github.ref }}"
+          echo "GITHUB_SHA: ${{ github.sha }}"
+          echo "GITHUB_EVENT_NAME: ${{ github.event_name }}"
+          echo "GITHUB_EVENT_PATH: ${{ github.event_path }}"
+          echo "GITHUB_WORKSPACE: ${{ github.workspace }}"
+          echo "GITHUB_API_URL: ${{ github.api_url }}"
+
+          # RESPONSE=$(curl -s -o response.json -w "%{http_code}" -X POST \
+          # -H "X-Api-Token: ${{ env.LOKALISE_API_TOKEN }}" \
+          # -H "accept: application/json" \
+          # -H "content-type: application/json" \
+          # -d '{
+          #   "format": "json",
+          #   "filter_data": ["translated","reviewed","verified"],
+          #   "filter_langs": ["fr","de","es","fr-CA"],
+          #   "filter_repositories":["NintexGlobal/pi-processmodeler/tree/lokalise/test1/packages/pi-administration:lokalise/test1"],
+          #   "directory_prefix": "",
+          #   "export_empty_as": "empty",
+          #   "webhook_url": "",
+          #   "indentation": "2sp"
+          #   "original_filenames": true,
+          #   "triggers": [
+          #     "github"
+          #   ]
+          #   }' \
+          # https://api.lokalise.com/api2/projects/${{ env.LOKALISE_PROJECT_ID }}/files/async-download)
+
+          # if [ "$RESPONSE" -ne 200 ]; then
+          #   curl -X POST -H 'Content-type: application/json' \
+          #     --data "{\"text\":\"Lokalise request failed with status code $RESPONSE\"}" \
+          #     'https://smee.io/HMel3UU8fCNtlx7'
+          # fi
