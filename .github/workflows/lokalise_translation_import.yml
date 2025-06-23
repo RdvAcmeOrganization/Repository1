@@ -84,22 +84,24 @@ jobs:
           echo "https://api.lokalise.com/api2/projects/$myProjectId/files/download)"
           echo "headers: $LOKALISE_API_TOKEN"
           
-          # RESPONSE=$(curl -s -o response.json -w "%{http_code}" -X POST \
-          #   -H "X-Api-Token: $LOKALISE_API_TOKEN" \
-          #   -H "accept: application/json" \
-          #   -H "content-type: application/json" \
-          #   -d "{\
-          #     \"format\": \"json\",\
-          #     \"filter_data\": [\"translated\",\"reviewed\",\"verified\"],\
-          #     \"filter_langs\": [${myLangs//,\"/\"}],\
-          #     \"filter_repositories\": [\"$myRepo/tree/$myBranch/packages/pi-administration:$myBranch\"],\
-          #     \"directory_prefix\": \"\",\
-          #     \"original_filenames\": true,\
-          #     \"triggers\": [\
-          #       \"github\"\
-          #     ]\
-          #   }" \
-          #   https://api.lokalise.com/api2/projects/$myProjectId/files/download)
+          RESPONSE=$(curl -s -o response.json -w "%{http_code}" -X POST \
+            -H "X-Api-Token: $LOKALISE_API_TOKEN" \
+            -H "accept: application/json" \
+            -H "content-type: application/json" \
+            -d "{\
+              \"format\": \"json\",\
+              \"filter_data\": [\"translated\",\"reviewed\",\"verified\"],\
+              \"filter_langs\": [${myLangs//,\"/\"}],\
+              \"filter_repositories\": [\"$myRepo/tree/$myBranch/packages/pi-administration:$myBranch\"],\
+              \"directory_prefix\": \"\",\
+              \"export_empty_as\": \"empty\",
+              \"indentation\": \"2sp\"
+              \"original_filenames\": true,\
+              \"triggers\": [\
+                \"github\"\
+              ]\
+            }" \
+            https://api.lokalise.com/api2/projects/$myProjectId/files/download)
 
           if [ "$RESPONSE" -ne 200 ]; then
             curl -X POST -H 'Content-type: application/json' \
