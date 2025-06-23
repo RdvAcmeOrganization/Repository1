@@ -80,28 +80,28 @@ jobs:
           myLangs=$(echo "$LOKALISE_LANGUAGES" | sed "s/\[//;s/\]//;s/'//g")
           myRepo=${{ github.repository }}
           myBranch=$(echo "${{ github.ref }}" | sed 's|refs/heads/||')
-          myProjectId=$LOKALISE_PROJECT_ID
+          myProjectId=${{env.LOKALISE_PROJECT_ID}}
           echo "myRepo value: $myRepo"
           echo "myBranch value: $myBranch"
           echo "myLangs value: $myLangs"
           echo "myProjectId value: $myProjectId"
 
-          RESPONSE=$(curl -s -o response.json -w "%{http_code}" -X POST \
-            -H "X-Api-Token: $LOKALISE_API_TOKEN" \
-            -H "accept: application/json" \
-            -H "content-type: application/json" \
-            -d "{\
-              \"format\": \"json\",\
-              \"filter_data\": [\"translated\",\"reviewed\",\"verified\"],\
-              \"filter_langs\": [${myLangs//,\"/\"}],\
-              \"filter_repositories\": [\"$myRepo/tree/$myBranch/packages/pi-administration:$myBranch\"],\
-              \"directory_prefix\": \"\",\
-              \"original_filenames\": true,\
-              \"triggers\": [\
-                \"github\"\
-              ]\
-            }" \
-            https://api.lokalise.com/api2/projects/$myProjectId/files/download)
+          # RESPONSE=$(curl -s -o response.json -w "%{http_code}" -X POST \
+          #   -H "X-Api-Token: $LOKALISE_API_TOKEN" \
+          #   -H "accept: application/json" \
+          #   -H "content-type: application/json" \
+          #   -d "{\
+          #     \"format\": \"json\",\
+          #     \"filter_data\": [\"translated\",\"reviewed\",\"verified\"],\
+          #     \"filter_langs\": [${myLangs//,\"/\"}],\
+          #     \"filter_repositories\": [\"$myRepo/tree/$myBranch/packages/pi-administration:$myBranch\"],\
+          #     \"directory_prefix\": \"\",\
+          #     \"original_filenames\": true,\
+          #     \"triggers\": [\
+          #       \"github\"\
+          #     ]\
+          #   }" \
+          #   https://api.lokalise.com/api2/projects/$myProjectId/files/download)
 
           if [ "$RESPONSE" -ne 200 ]; then
             curl -X POST -H 'Content-type: application/json' \
