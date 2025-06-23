@@ -84,24 +84,27 @@ jobs:
           echo "https://api.lokalise.com/api2/projects/$myProjectId/files/download)"
           echo "headers: $LOKALISE_API_TOKEN"
 
+          JSON_PAYLOAD="{\
+            \"format\": \"json\",\
+            \"original_filenames\": true,\
+            \"filter_langs\": [\"en\",\"es\",\"fr\",\"de\",\"fr-CA\"],\
+            \"export_empty_as\": \"empty\",\
+            \"export_sort\": \"a_z\",\
+            \"indentation\": \"2sp\",\
+            \"json_unescaped_slashes\": true,\
+            \"triggers\": [\
+              \"github\"\
+            ]\
+          }"
+
+          echo "Curl -d payload: $JSON_PAYLOAD"
+
           RESPONSE_BODY=$(mktemp)
           HTTP_CODE=$(curl -s -o "$RESPONSE_BODY" -w "%{http_code}" -X POST \
             -H "X-Api-Token: $LOKALISE_API_TOKEN" \
             -H "accept: application/json" \
             -H "content-type: application/json" \
-            -d "{\
-              \"format\": \"json\",\
-              \"filter_langs\": [\"en\",\"es\",\"fr\",\"de\",\"fr-CA\"],\
-              \"directory_prefix\": \"\",\
-              \"export_empty_as\": \"empty\",\
-              \"export_sort\": \"a_z\",\
-              \"indentation\": \"2sp\",\
-              \"json_unescaped_slashes\": true,\
-              \"original_filenames\": true,\
-              \"triggers\": [\
-                \"github\"\
-              ]\
-            }" \
+            -d "$JSON_PAYLOAD" \
             "https://api.lokalise.com/api2/projects/$myProjectId/files/async-download")
 
           echo "HTTP status: $HTTP_CODE"
