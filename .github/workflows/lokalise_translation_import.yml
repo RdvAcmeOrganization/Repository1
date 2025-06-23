@@ -88,6 +88,7 @@ jobs:
             \"format\": \"json\",\
             \"original_filenames\": true,\
             \"filter_langs\": [\"en\",\"es\",\"fr\",\"de\",\"fr-CA\"],\
+            \"directory_prefix\": \"\",\
             \"export_empty_as\": \"empty\",\
             \"export_sort\": \"a_z\",\
             \"indentation\": \"2sp\",\
