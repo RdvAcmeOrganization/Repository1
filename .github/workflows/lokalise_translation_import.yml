@@ -41,19 +41,24 @@ jobs:
       - name: Validate required secrets and environment variables
         env:
           LOKALISE_API_TOKEN: ${{ secrets.LOKALISE_API_TOKEN }}
-          LOKALISE_PROJECT_ID: ${{ env.LOKALISE_PROJECT_ID }}
-          LOKALISE_LANGUAGES: ${{ env.LOKALISE_LANGUAGES }}
+          LOKALISE_PROJECT_ID: ${{ vars.LOKALISE_PROJECT_ID }}
+          LOKALISE_LANGUAGES: ${{ vars.LOKALISE_LANGUAGES }}
 
         run: |
           if [ -z "$LOKALISE_API_TOKEN" ]; then
             echo "LOKALISE_API_TOKEN is not set in organization secrets. For more details read https://google.com" && exit 1
           fi
+          echo "LOKALISE_API_TOKEN is set in organization secrets : $LOKALISE_API_TOKEN"
+
           if [ -z "$LOKALISE_PROJECT_ID" ]; then
             echo "LOKALISE_PROJECT_ID is not set in the repository variables. For more details read https://google.com" && exit 1
           fi
+          echo "LOKALISE_PROJECT_ID is set in the repository variables : $LOKALISE_PROJECT_ID"
+
           if [ -z "$LOKALISE_LANGUAGES" ]; then
             echo "LOKALISE_LANGUAGES is not set in the repository variables. For more details read https://google.com" && exit 1
           fi
+          echo "LOKALISE_LANGUAGES is set in the repository variables : $LOKALISE_LANGUAGES"
           
           # Validate key lengths (ensure they have at least one character)
           if [ ${#LOKALISE_API_TOKEN} -lt 1 ]; then
