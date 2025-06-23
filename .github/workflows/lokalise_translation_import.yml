@@ -94,6 +94,7 @@ jobs:
               \"filter_langs\": [$(echo $myLangs | sed 's/,/\",\"/g; s/^/\"/; s/$/\"/')],\
               \"directory_prefix\": \"\",\
               \"export_empty_as\": \"empty\",\
+              \"export_sort\": \"a_z\",\
               \"indentation\": \"2sp\",\
               \"json_unescaped_slashes\": true,\
               \"original_filenames\": true,\
