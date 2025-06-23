@@ -83,8 +83,9 @@ jobs:
           echo "myProjectId value: $myProjectId"
           echo "https://api.lokalise.com/api2/projects/$myProjectId/files/download)"
           echo "headers: $LOKALISE_API_TOKEN"
-          
-          RESPONSE=$(curl -s -o response.json -w "%{http_code}" -X POST \
+
+          RESPONSE_BODY=$(mktemp)
+          HTTP_CODE=$(curl -s -o "$RESPONSE_BODY" -w "%{http_code}" -X POST \
             -H "X-Api-Token: $LOKALISE_API_TOKEN" \
             -H "accept: application/json" \
             -H "content-type: application/json" \
@@ -94,17 +95,21 @@ jobs:
               \"filter_langs\": [${myLangs//,\"/\"}],\
               \"filter_repositories\": [\"$myRepo/tree/$myBranch/packages/pi-administration:$myBranch\"],\
               \"directory_prefix\": \"\",\
-              \"export_empty_as\": \"empty\",
-              \"indentation\": \"2sp\"
+              \"export_empty_as\": \"empty\",\
+              \"indentation\": \"2sp\",\
               \"original_filenames\": true,\
               \"triggers\": [\
                 \"github\"\
               ]\
             }" \
-            https://api.lokalise.com/api2/projects/$myProjectId/files/download)
+            "https://api.lokalise.com/api2/projects/$myProjectId/files/download")
 
-          if [ "$RESPONSE" -ne 200 ]; then
+          echo "HTTP status: $HTTP_CODE"
+          echo "Response body:"
+          cat "$RESPONSE_BODY"
+
+          if [ "$HTTP_CODE" -ne 200 ]; then
             curl -X POST -H 'Content-type: application/json' \
-              --data "{\"text\":\"Lokalise request failed with status code $RESPONSE\"}" \
+              --data "{\"text\":\"Lokalise request failed with status code $HTTP_CODE. Response: $(cat $RESPONSE_BODY | head -c 500)\"}" \
               'https://smee.io/HMel3UU8fCNtlx7'
           fi
