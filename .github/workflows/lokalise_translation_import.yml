@@ -102,7 +102,7 @@ jobs:
                 \"github\"\
               ]\
             }" \
-            "https://api.lokalise.com/api2/projects/$myProjectId/files/download")
+            "https://api.lokalise.com/api2/projects/$myProjectId/files/async-download")
 
           echo "HTTP status: $HTTP_CODE"
           echo "Response body:"
