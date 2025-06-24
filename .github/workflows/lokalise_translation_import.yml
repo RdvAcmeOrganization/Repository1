@@ -32,7 +32,7 @@ on:
       filter_langs:
         description: 'Languages to filter (JSON array)'
         required: true
-        default: '["en","es","fr","de","fr-CA"]'
+        default: '["en","fr","fr_CA","de","es"]'
         type: string
   # schedule:
   #   - cron: '*/5 * * * *'
@@ -99,6 +99,7 @@ jobs:
             \"export_sort\": \"a_z\",\
             \"indentation\": \"2sp\",\
             \"json_unescaped_slashes\": true,\
+            \"replace_breaks\": true,\
             \"triggers\": [\
               \"github\"\
             ]\
