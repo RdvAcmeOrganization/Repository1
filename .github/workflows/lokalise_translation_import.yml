@@ -71,49 +71,62 @@ jobs:
             echo "LOKALISE_LANGUAGES must have at least one character" && exit 1
           fi
 
-      - name: Make request to external URI
+      # - name: Make request to external URI
+      #   run: |
+      #     myLangs=$(echo "$LOKALISE_LANGUAGES" | sed "s/\[//;s/\]//;s/'//g")
+      #     myRepo=${{ github.repository }}
+      #     myBranch=$(echo "${{ github.ref }}" | sed 's|refs/heads/||')
+      #     myProjectId=${{vars.LOKALISE_PROJECT_ID}}
+      #     echo "myRepo value: $myRepo"
+      #     echo "myBranch value: $myBranch"
+      #     echo "myLangs value: $myLangs"
+      #     echo "myProjectId value: $myProjectId"
+      #     echo "https://api.lokalise.com/api2/projects/$myProjectId/files/download)"
+      #     echo "headers: $LOKALISE_API_TOKEN"
+
+      #     JSON_PAYLOAD="{\
+      #       \"format\": \"json\",\
+      #       \"original_filenames\": true,\
+      #       \"filter_langs\": [\"en\",\"es\",\"fr\",\"de\",\"fr-CA\"],\
+      #       \"directory_prefix\": \"\",\
+      #       \"export_empty_as\": \"empty\",\
+      #       \"export_sort\": \"a_z\",\
+      #       \"indentation\": \"2sp\",\
+      #       \"json_unescaped_slashes\": true,\
+      #       \"triggers\": [\
+      #         \"github\"\
+      #       ]\
+      #     }"
+
+      #     echo "Curl -d payload: $JSON_PAYLOAD"
+
+      #     RESPONSE_BODY=$(mktemp)
+      #     HTTP_CODE=$(curl -s -o "$RESPONSE_BODY" -w "%{http_code}" -X POST \
+      #       -H "X-Api-Token: $LOKALISE_API_TOKEN" \
+      #       -H "accept: application/json" \
+      #       -H "content-type: application/json" \
+      #       -d "$JSON_PAYLOAD" \
+      #       "https://api.lokalise.com/api2/projects/$myProjectId/files/async-download")
+
+      #     echo "HTTP status: $HTTP_CODE"
+      #     echo "Response body:"
+      #     cat "$RESPONSE_BODY"
+
+      #     if [ "$HTTP_CODE" -ne 200 ]; then
+      #       curl -X POST -H 'Content-type: application/json' \
+      #         --data "{\"text\":\"Lokalise request failed with status code $HTTP_CODE. Response: $(cat $RESPONSE_BODY | head -c 500)\"}" \
+      #         'https://smee.io/HMel3UU8fCNtlx7'
+      #     fi
+
+      - name: Update PR title for Lokalise translation update
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          myLangs=$(echo "$LOKALISE_LANGUAGES" | sed "s/\[//;s/\]//;s/'//g")
-          myRepo=${{ github.repository }}
-          myBranch=$(echo "${{ github.ref }}" | sed 's|refs/heads/||')
-          myProjectId=${{vars.LOKALISE_PROJECT_ID}}
-          echo "myRepo value: $myRepo"
-          echo "myBranch value: $myBranch"
-          echo "myLangs value: $myLangs"
-          echo "myProjectId value: $myProjectId"
-          echo "https://api.lokalise.com/api2/projects/$myProjectId/files/download)"
-          echo "headers: $LOKALISE_API_TOKEN"
-
-          JSON_PAYLOAD="{\
-            \"format\": \"json\",\
-            \"original_filenames\": true,\
-            \"filter_langs\": [\"en\",\"es\",\"fr\",\"de\",\"fr-CA\"],\
-            \"directory_prefix\": \"\",\
-            \"export_empty_as\": \"empty\",\
-            \"export_sort\": \"a_z\",\
-            \"indentation\": \"2sp\",\
-            \"json_unescaped_slashes\": true,\
-            \"triggers\": [\
-              \"github\"\
-            ]\
-          }"
-
-          echo "Curl -d payload: $JSON_PAYLOAD"
-
-          RESPONSE_BODY=$(mktemp)
-          HTTP_CODE=$(curl -s -o "$RESPONSE_BODY" -w "%{http_code}" -X POST \
-            -H "X-Api-Token: $LOKALISE_API_TOKEN" \
-            -H "accept: application/json" \
-            -H "content-type: application/json" \
-            -d "$JSON_PAYLOAD" \
-            "https://api.lokalise.com/api2/projects/$myProjectId/files/async-download")
-
-          echo "HTTP status: $HTTP_CODE"
-          echo "Response body:"
-          cat "$RESPONSE_BODY"
-
-          if [ "$HTTP_CODE" -ne 200 ]; then
-            curl -X POST -H 'Content-type: application/json' \
-              --data "{\"text\":\"Lokalise request failed with status code $HTTP_CODE. Response: $(cat $RESPONSE_BODY | head -c 500)\"}" \
-              'https://smee.io/HMel3UU8fCNtlx7'
+          pr_number=$(gh pr list --state open --search "Lokalise: Translations update in:title" --json number,title | jq -r '.[] | select(.title=="Lokalise: Translations update") | .number')
+          if [ -n "$pr_number" ]; then
+            new_title="chore: translations update $(date '+%Y-%m-%d %H:%M:%S')"
+            echo "Updating PR #$pr_number title to: $new_title"
+            gh pr edit "$pr_number" --title "$new_title"
+          else
+            echo "No open PR with title 'Lokalise: Translations update' found."
           fi
