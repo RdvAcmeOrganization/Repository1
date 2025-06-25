@@ -54,7 +54,6 @@ jobs:
     env:
       LOKALISE_API_TOKEN: ${{ secrets.LOKALISE_API_TOKEN }}
       LOKALISE_PROJECT_ID: ${{ vars.LOKALISE_PROJECT_ID }}
-      LOKALISE_LANGUAGES: ${{ vars.LOKALISE_LANGUAGES }}
       FILTER_LANGS: ${{ github.event.inputs.filter_langs }}
       TRIGGERS: ${{ github.event.inputs.triggers }}
 
@@ -72,10 +71,10 @@ jobs:
           fi
           echo "LOKALISE_PROJECT_ID is set in the repository variables : $LOKALISE_PROJECT_ID"
 
-          if [ -z "$LOKALISE_LANGUAGES" ]; then
-            echo "LOKALISE_LANGUAGES is not set in the repository variables. For more details read https://google.com" && exit 1
+          if [ -z "$FILTER_LANGS" ]; then
+            echo "FILTER_LANGS is not set in the repository variables. For more details read https://google.com" && exit 1
           fi
-          echo "LOKALISE_LANGUAGES is set in the repository variables : $LOKALISE_LANGUAGES"
+          echo "FILTER_LANGS is set in the repository variables : $FILTER_LANGS"
           
           # Validate key lengths (ensure they have at least one character)
           if [ ${#LOKALISE_API_TOKEN} -lt 1 ]; then
@@ -84,8 +83,8 @@ jobs:
           if [ ${#LOKALISE_PROJECT_ID} -lt 1 ]; then
             echo "LOKALISE_PROJECT_ID must have at least one character" && exit 1
           fi
-          if [ ${#LOKALISE_LANGUAGES} -lt 1 ]; then
-            echo "LOKALISE_LANGUAGES must have at least one character" && exit 1
+          if [ ${#FILTER_LANGS} -lt 1 ]; then
+            echo "FILTER_LANGS must have at least one character" && exit 1
           fi
  
       - name: Export base language
@@ -165,10 +164,10 @@ jobs:
               'https://smee.io/HMel3UU8fCNtlx7'
           fi
 
-      - name: Check if LOKALISE_LANGUAGES is non-empty
+      - name: Check if FILTER_LANGS is non-empty
         id: check_langs
         run: |
-          LANGS="$LOKALISE_LANGUAGES"
+          LANGS="$FILTER_LANGS"
           # Remove whitespace
           LANGS=$(echo "$LANGS" | tr -d '[:space:]')
           if [ "$LANGS" = "" ] || [ "$LANGS" = "[]" ]; then
