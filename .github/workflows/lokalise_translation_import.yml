@@ -89,7 +89,7 @@ jobs:
           fi
  
       - name: Export base language
-        if: ${{ github.event.inputs.export_base_lang == true }}
+        if: ${{ github.event.inputs.export_base_lang == 'true' }}
         run: |
           echo "Exporting base language"
           myLangs=[en]
