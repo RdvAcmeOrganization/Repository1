@@ -137,6 +137,7 @@ jobs:
           fi
 
       - name: Request Lokalise translations
+        if: ${{ env.LOKALISE_LANGUAGES != '' && env.LOKALISE_LANGUAGES != '[]' }}
         run: |
           echo "Requesting translations from Lokalise"
           myLangs=$(echo "$LOKALISE_LANGUAGES" | sed "s/\[//;s/\]//;s/'//g")
@@ -147,7 +148,7 @@ jobs:
           echo "myBranch value: $myBranch"
           echo "myLangs value: $myLangs"
           echo "myProjectId value: $myProjectId"
-          echo "https://api.lokalise.com/api2/projects/$myProjectId/files/download)"
+          echo "https://api.lokalise.com/api2/projects/$myProjectId/files/async-download)"
           echo "headers: $LOKALISE_API_TOKEN"
 
           JSON_PAYLOAD="{\
