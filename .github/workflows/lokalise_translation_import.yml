@@ -34,6 +34,11 @@ on:
         required: true
         default: '["en","fr","fr_CA","de","es"]'
         type: string
+      triggers:
+        description: 'Triggers array (JSON array)'
+        required: true
+        default: '["github"]'
+        type: string
   # schedule:
   #   - cron: '*/5 * * * *'
 
@@ -46,6 +51,7 @@ jobs:
       LOKALISE_PROJECT_ID: ${{ vars.LOKALISE_PROJECT_ID }}
       LOKALISE_LANGUAGES: ${{ vars.LOKALISE_LANGUAGES }}
       FILTER_LANGS: ${{ github.event.inputs.filter_langs }}
+      TRIGGERS: ${{ github.event.inputs.triggers }}
 
     steps:
       - name: Validate required secrets and environment variables
@@ -96,13 +102,12 @@ jobs:
             \"filter_langs\": $FILTER_LANGS,\
             \"directory_prefix\": \"\",\
             \"export_empty_as\": \"empty\",\
+            \"filter_data\": [\"translated\",\"reviewed\",\"verified\"],\
             \"export_sort\": \"a_z\",\
             \"indentation\": \"2sp\",\
             \"json_unescaped_slashes\": true,\
-            \"replace_breaks\": true,\
-            \"triggers\": [\
-              \"github\"\
-            ]\
+            \"replace_breaks\": false,\
+            \"triggers\": $TRIGGERS\
           }"
 
           echo "Curl -d payload: $JSON_PAYLOAD"
