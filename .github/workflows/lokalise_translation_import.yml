@@ -43,6 +43,7 @@ on:
         default: '["github"]'
         type: choice
         options:
+          - '[]'
           - '["github"]'
           - '["azure"]'
   # schedule:
