@@ -137,16 +137,11 @@ jobs:
       - name: Export translations
         if: ${{ github.event.inputs.filter_langs != '' && github.event.inputs.filter_langs != '[]' }}
         run: |
-          echo "Requesting translations from Lokalise for each language"
-          myProjectId=$LOKALISE_PROJECT_ID
-          echo "myProjectId value: $myProjectId"
-
-          for lang in $(echo $FILTER_LANGS | jq -r '.[]'); do
-            echo "Processing language: $lang"
+          echo "Exporting translations"
             JSON_PAYLOAD="{\
               \"format\": \"json\",\
               \"original_filenames\": true,\
-              \"filter_langs\": [\"$lang\"],\
+              \"filter_langs\": $FILTER_LANGS,\
               \"directory_prefix\": \"\",\
               \"filter_data\": [\"translated\",\"reviewed\",\"verified\"],\
               \"export_sort\": \"a_z\",\
