@@ -23,6 +23,8 @@ name: Update PR Title
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+permissions:
+    pull-requests: write
 jobs:
   update_pr_title:
     runs-on: ubuntu-latest
