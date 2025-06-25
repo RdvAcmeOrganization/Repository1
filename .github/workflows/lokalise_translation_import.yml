@@ -140,9 +140,9 @@ jobs:
           echo "Requesting translations from Lokalise for each language"
           myProjectId=$LOKALISE_PROJECT_ID
           echo "myProjectId value: $myProjectId"
-          echo "headers: $LOKALISE_API_TOKEN"
+
           for lang in $(echo $FILTER_LANGS | jq -r '.[]'); do
-            echo "Processing language: $lang"
+            echo "\nProcessing language: $lang"
             JSON_PAYLOAD="{\
               \"format\": \"json\",\
               \"original_filenames\": true,\
@@ -165,11 +165,10 @@ jobs:
               "https://api.lokalise.com/api2/projects/$myProjectId/files/async-download")
             echo "HTTP status: $HTTP_CODE"
             echo "Response body:"
-            cat "$RESPONSE_BODY"
+            cat "$RESPONSE_BODY \n\n"
             if [ "$HTTP_CODE" -ne 200 ]; then
               curl -X POST -H 'Content-type: application/json' \
                 --data "{\"text\":\"Lokalise request failed for $lang with status code $HTTP_CODE. Response: $(cat $RESPONSE_BODY | head -c 500)\"}" \
                 'https://smee.io/HMel3UU8fCNtlx7'
             fi
-          done
         shell: bash
