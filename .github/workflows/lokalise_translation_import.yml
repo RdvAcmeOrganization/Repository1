@@ -94,7 +94,6 @@ jobs:
           myProjectId=${{vars.LOKALISE_PROJECT_ID}}
           echo "myLangs value: $myLangs"
           echo "myProjectId value: $myProjectId"
-          echo "https://api.lokalise.com/api2/projects/$myProjectId/files/async-download)"
 
           JSON_PAYLOAD="{\
             \"format\": \"json\",\
@@ -122,6 +121,7 @@ jobs:
           echo "HTTP status: $HTTP_CODE"
           echo "Response body:"
           cat "$RESPONSE_BODY"
+          echo
 
           # Extract process_id and set as output (GitHub Actions new syntax)
           PROCESS_ID=$(cat "$RESPONSE_BODY" | jq -r '.process_id')
@@ -138,6 +138,7 @@ jobs:
         if: ${{ github.event.inputs.filter_langs != '' && github.event.inputs.filter_langs != '[]' }}
         run: |
           echo "Exporting translations"
+            myProjectId=${{vars.LOKALISE_PROJECT_ID}}
             JSON_PAYLOAD="{\
               \"format\": \"json\",\
               \"original_filenames\": true,\
@@ -158,6 +159,7 @@ jobs:
               -H "content-type: application/json" \
               -d "$JSON_PAYLOAD" \
               "https://api.lokalise.com/api2/projects/$myProjectId/files/async-download")
+
             echo "HTTP status: $HTTP_CODE"
             echo "Response body:"
             cat "$RESPONSE_BODY"
