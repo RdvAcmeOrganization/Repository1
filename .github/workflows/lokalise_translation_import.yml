@@ -165,13 +165,25 @@ jobs:
               'https://smee.io/HMel3UU8fCNtlx7'
           fi
 
+      - name: Check if LOKALISE_LANGUAGES is non-empty
+        id: check_langs
+        run: |
+          LANGS="$LOKALISE_LANGUAGES"
+          # Remove whitespace
+          LANGS=$(echo "$LANGS" | tr -d '[:space:]')
+          if [ "$LANGS" = "" ] || [ "$LANGS" = "[]" ]; then
+            echo "has_langs=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_langs=true" >> $GITHUB_OUTPUT
+          fi
+
       - name: Request Lokalise translations
-        if: ${{ env.LOKALISE_LANGUAGES != '' && env.LOKALISE_LANGUAGES != '[]' }}
+        if: steps.check_langs.outputs.has_langs == 'true'
         run: |
           echo "Requesting translations from Lokalise"
           myRepo=${{ github.repository }}
           myBranch=$(echo "${{ github.ref }}" | sed 's|refs/heads/||')
-          myProjectId=${{vars.LOKALISE_PROJECT_ID}}
+          myProjectId=$LOKALISE_PROJECT_ID
           echo "myRepo value: $myRepo"
           echo "myBranch value: $myBranch"
           echo "myProjectId value: $myProjectId"
