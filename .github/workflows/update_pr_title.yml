@@ -40,7 +40,7 @@ jobs:
             const head_branch = context.payload.pull_request.head.ref;
 
             // Define the title template. This example uses the branch name.
-            const title_template = `[${head_branch}] Updated PR Title`;
+            const title_template = `feat: Updating Translations (AB#)`;
 
             try {
               // Get the current PR details
