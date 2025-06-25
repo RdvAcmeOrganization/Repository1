@@ -1,3 +1,24 @@
+# =============================================
+# GitHub Actions Workflow: Update PR Title
+# =============================================
+#
+# Purpose:
+#   Automatically updates the title of a pull request (PR) when it is opened, synchronized, or reopened.
+#   The PR title is only updated if the current title starts with 'lokalise' (case-insensitive).
+#
+# Features:
+#   - Triggers on PR events: opened, synchronize, reopened
+#   - Uses the head branch name to generate a new PR title
+#   - Only updates PRs whose title starts with 'lokalise'
+#   - Logs actions and errors for traceability
+#
+# Usage:
+#   - Add this workflow to your repository in .github/workflows/update_pr_title.yml
+#   - When a PR is created or updated, if its title starts with 'lokalise', the title will be updated to '[<head_branch>] Updated PR Title'
+#   - No update is performed for PRs with titles not starting with 'lokalise'
+#
+# =============================================
+
 name: Update PR Title
 on:
   pull_request:
