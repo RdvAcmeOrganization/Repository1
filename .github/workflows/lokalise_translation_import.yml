@@ -131,10 +131,10 @@ jobs:
           echo "Response body:"
           cat "$RESPONSE_BODY"
 
-          # Extract process_id and set as output
+          # Extract process_id and set as output (GitHub Actions new syntax)
           PROCESS_ID=$(cat "$RESPONSE_BODY" | jq -r '.process_id')
           echo "process_id: $PROCESS_ID"
-          echo "::set-output name=lokalise_process_id::$PROCESS_ID"
+          echo "lokalise_process_id=$PROCESS_ID" >> $GITHUB_OUTPUT
 
           if [ "$HTTP_CODE" -ne 200 ]; then
             curl -X POST -H 'Content-type: application/json' \
@@ -143,10 +143,11 @@ jobs:
           fi
 
       - name: Get Process Info
+        if: ${{ github.event.inputs.export_base_lang == 'true' }}
         run: |
           myProjectId=${{vars.LOKALISE_PROJECT_ID}}
           myProcessId=${{steps.export_base.outputs.lokalise_process_id}}
-          echo "Requesting Process info for processId: $myProjectId"
+          echo "Requesting Process info for processId: $myProcessId"
           RESPONSE_BODY=$(mktemp)
           HTTP_CODE=$(curl -s -o "$RESPONSE_BODY" -w "%{http_code}" -X GET \
             -H "X-Api-Token: $LOKALISE_API_TOKEN" \
