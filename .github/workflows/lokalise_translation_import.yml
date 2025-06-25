@@ -142,7 +142,7 @@ jobs:
           echo "myProjectId value: $myProjectId"
 
           for lang in $(echo $FILTER_LANGS | jq -r '.[]'); do
-            echo "\nProcessing language: $lang"
+            echo "Processing language: $lang"
             JSON_PAYLOAD="{\
               \"format\": \"json\",\
               \"original_filenames\": true,\
