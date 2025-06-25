@@ -1,0 +1,45 @@
+name: Update PR Title
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  update_pr_title:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Update PR Title
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const pull_number = context.payload.pull_request.number;
+            const base_branch = context.payload.pull_request.base.ref;
+            const head_branch = context.payload.pull_request.head.ref;
+
+            // Define the title template. This example uses the branch name.
+            const title_template = `[${head_branch}] Updated PR Title`;
+
+            try {
+              // Get the current PR details
+              const { data: pullRequest } = await github.rest.pulls.get({
+                owner,
+                repo,
+                pull_number,
+              });
+
+              // Only update if the current title starts with 'lokalise' (case-insensitive)
+              if (/^lokalise/i.test(pullRequest.title)) {
+                await github.rest.pulls.update({
+                  owner,
+                  repo,
+                  pull_number,
+                  title: title_template,
+                });
+                console.log(`PR title updated to: ${title_template}`);
+              } else {
+                console.log('PR title does not start with "lokalise". No update performed.');
+              }
+            } catch (error) {
+              console.error('Error updating PR title:', error);
+              core.setFailed(error.message);
+            }
