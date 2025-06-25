@@ -93,7 +93,7 @@ jobs:
         if: ${{ github.event.inputs.export_base_lang == 'true' }}
         run: |
           echo "Exporting base language"
-          myLangs=['en']
+          myLangs=[\"en\"]
           myRepo=${{ github.repository }}
           myBranch=$(echo "${{ github.ref }}" | sed 's|refs/heads/||')
           myProjectId=${{vars.LOKALISE_PROJECT_ID}}
