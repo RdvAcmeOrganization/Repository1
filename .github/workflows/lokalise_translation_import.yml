@@ -89,6 +89,7 @@ jobs:
           fi
  
       - name: Export base language
+        id: export_base
         if: ${{ github.event.inputs.export_base_lang == 'true' }}
         run: |
           echo "Exporting base language"
@@ -100,13 +101,13 @@ jobs:
           echo "myBranch value: $myBranch"
           echo "myLangs value: $myLangs"
           echo "myProjectId value: $myProjectId"
-          echo "https://api.lokalise.com/api2/projects/$myProjectId/files/download)"
+          echo "https://api.lokalise.com/api2/projects/$myProjectId/files/async-download)"
           echo "headers: $LOKALISE_API_TOKEN"
 
           JSON_PAYLOAD="{\
             \"format\": \"json\",\
             \"original_filenames\": true,\
-            \"filter_langs\": $FILTER_LANGS,\
+            \"filter_langs\": $myLangs,\
             \"directory_prefix\": \"\",\
             \"export_empty_as\": \"empty\",\
             \"export_sort\": \"a_z\",\
@@ -130,6 +131,33 @@ jobs:
           echo "Response body:"
           cat "$RESPONSE_BODY"
 
+          # Extract process_id and set as output
+          PROCESS_ID=$(cat "$RESPONSE_BODY" | jq -r '.process_id')
+          echo "process_id: $PROCESS_ID"
+          echo "::set-output name=lokalise_process_id::$PROCESS_ID"
+
+          if [ "$HTTP_CODE" -ne 200 ]; then
+            curl -X POST -H 'Content-type: application/json' \
+              --data "{\"text\":\"Lokalise request failed with status code $HTTP_CODE. Response: $(cat $RESPONSE_BODY | head -c 500)\"}" \
+              'https://smee.io/HMel3UU8fCNtlx7'
+          fi
+
+      - name: Get Process Info
+        run: |
+          myProjectId=${{vars.LOKALISE_PROJECT_ID}}
+          myProcessId=${{steps.export_base.outputs.lokalise_process_id}}
+          echo "Requesting Process info for processId: $myProjectId"
+          RESPONSE_BODY=$(mktemp)
+          HTTP_CODE=$(curl -s -o "$RESPONSE_BODY" -w "%{http_code}" -X GET \
+            -H "X-Api-Token: $LOKALISE_API_TOKEN" \
+            -H "accept: application/json" \
+            -H "content-type: application/json" \
+            "https://api.lokalise.com/api2/projects/$myProjectId/processes/$myProcessId")
+
+          echo "HTTP status: $HTTP_CODE"
+          echo "Response body:"
+          cat "$RESPONSE_BODY"
+
           if [ "$HTTP_CODE" -ne 200 ]; then
             curl -X POST -H 'Content-type: application/json' \
               --data "{\"text\":\"Lokalise request failed with status code $HTTP_CODE. Response: $(cat $RESPONSE_BODY | head -c 500)\"}" \
@@ -140,13 +168,11 @@ jobs:
         if: ${{ env.LOKALISE_LANGUAGES != '' && env.LOKALISE_LANGUAGES != '[]' }}
         run: |
           echo "Requesting translations from Lokalise"
-          myLangs=$(echo "$LOKALISE_LANGUAGES" | sed "s/\[//;s/\]//;s/'//g")
           myRepo=${{ github.repository }}
           myBranch=$(echo "${{ github.ref }}" | sed 's|refs/heads/||')
           myProjectId=${{vars.LOKALISE_PROJECT_ID}}
           echo "myRepo value: $myRepo"
           echo "myBranch value: $myBranch"
-          echo "myLangs value: $myLangs"
           echo "myProjectId value: $myProjectId"
           echo "https://api.lokalise.com/api2/projects/$myProjectId/files/async-download)"
           echo "headers: $LOKALISE_API_TOKEN"
