@@ -144,6 +144,8 @@ jobs:
       - name: Get Process Info
         if: ${{ github.event.inputs.export_base_lang == 'true' }}
         run: |
+          echo "Waiting 10 seconds before requesting process info..."
+          sleep 10
           myProjectId=${{vars.LOKALISE_PROJECT_ID}}
           myProcessId=${{steps.export_base.outputs.lokalise_process_id}}
           echo "Requesting Process info for processId: $myProcessId"
